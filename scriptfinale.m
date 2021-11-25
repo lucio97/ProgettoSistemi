@@ -2,6 +2,10 @@ clear all;
 close all;
 clc;
 
+
+
+
+
 radius = 128; %raggio approssimato ricavato convertendo l`area data dal pdf
 xx0 = 0;
 yy0 = 0;
