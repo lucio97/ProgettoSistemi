@@ -2,7 +2,8 @@ clear all;
 close all;
 clc;
 
-radius = 128; %raggio approssimato ricavato convertendo l`area data dal pdf
+% % Variables
+radius = 2000; %approximated found by the given area on the pdf
 xx0 = 0;
 yy0 = 0;
 areaTotale=pi*radius^2; 
@@ -10,15 +11,16 @@ h_drone = 320;
 h_ric=0;
 G_tx = 4;
 G_rx = 2;
-freq = 5800;
+freq = 2*10^9;
 c = physconst('lightspeed');
 wavelenght= c/freq;
-P_tx = 0.063;
+P_tx = 0.063; %dbm
 a = 0.3;
 b =300*10^(-6);
+lambda=0.0001; %big area little lambda
+eta= 2;
 
 
-lambda=0.001; %area grande lambda piccolo
 
 numbPoints=poissrnd(areaTotale*lambda);%Poisson number of points
 theta=2*pi*(rand(numbPoints,1)); %angular coordinates
@@ -40,7 +42,7 @@ header = {'Raggio','Distanza','Theta in Gradi'};
 xForDisplay = [header; num2cell(D)];
 figure
 uitable('Data', xForDisplay);
-clear xForDisplay
+clear xForDisplay header
 %Shift centre of disk to (xx0,yy0)
 xx=xx+xx0;
 yy=yy+yy0;
@@ -51,7 +53,7 @@ yy=yy+yy0;
 
 % x = [x; newval]
 %plos=1./(1+a.*exp(-b.*(E-a)));
-m=floor(D(:,1).*sqrt(a*b));
+m=floor(D(:,2).*sqrt(a*b));
 count=size(m,1);
 plos=zeros(count,1);
 for i=1:count
@@ -64,6 +66,13 @@ for i=1:count
     plos(i)=plostmp;
 end
 clear plostmp plostmp1
+% for i=1:count
+%     pllos=(20log10(4pi/wavelenght))+(10*eta_l*log10(D(i,2)))+gaussrand;
+%     plnlos=(20log10(4pi/wavelenght))+(10*eta_nl*log10(D(i,2)))+gaussrand;
+%     pl=plos(i)*pllos(i)+((1-plos(i))*plnlos(i);
+% end
+
+
 
 % 
 % P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
