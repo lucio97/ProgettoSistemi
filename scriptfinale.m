@@ -2,6 +2,15 @@ clear all;
 close all;
 clc;
 
+% to do
+% altri droni (3.5km)
+% distanza droni ricev
+% formula sinr e sir
+% uplink e downlink
+% insalata conidta
+
+
+
 % % Variables
 radius = 2000; %m approximated found by the given area on the pdf
 xx0 = 0;
@@ -15,9 +24,10 @@ freq = 2.4*10^9;
 c = physconst('lightspeed');
 wavelenght= c/freq;
 P_tx = 0.063; % dbm
+P_N = 2;
 a = 0.3;
 b =300e-6; % buildings/m^2
-lambda=1e-5; % u/m big area little lambda
+lambda=5e-6; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
 
@@ -26,8 +36,13 @@ numbPoints=poissrnd(areaTotale*lambda);%Poisson number of receiver
 theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
 rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
 %Convert from polar to Cartesian coordinates
-[xx,yy]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
-D = pdist2([0 0], [xx, yy]);
+[x,y]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
+figure
+pax = polaraxes;
+polarplot(theta,rho2,'d')
+pax.ThetaDir = 'counterclockwise';
+pax.FontSize = 12;
+D = pdist2([0 0], [x, y]);
 D = transpose(D);
 C = hypot(D,h_drone);
 ThetaRad = asin(h_drone./C); %elevation angle
@@ -43,8 +58,8 @@ figure
 uitable('Data', xForDisplay);
 clear xForDisplay header
 %Shift centre of disk to (xx0,yy0)
-xx=xx+xx0;
-yy=yy+yy0;
+x=x+xx0;
+y=y+yy0;
 
 
 
@@ -68,16 +83,15 @@ pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
 pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
 path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
 
-
-
-% P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
+P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
-
+SNR = P_tx/P_N;
 
 figure
-pax = polaraxes;
+gscatter(x,y,prob_los)
 
-polarplot(theta,rho2,'d')
-
-pax.ThetaDir = 'counterclockwise';
-pax.FontSize = 12;
+% figure
+% [X,Y]=meshgrid(x,y);
+% Z=zeros(size(x));
+% Z=repmat(Z,1,numbPoints);
+% surf(X,Y,Z)
