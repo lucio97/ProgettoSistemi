@@ -2,12 +2,14 @@ clear all;
 close all;
 clc;
 
+
+
 % to do
-% altri droni (3.5km)
-% distanza droni ricev
-% formula sinr e sir
+% altri droni (3.5km) ok
+% distanza droni ricev ok
+% formula sinr e sir ok
 % uplink e downlink
-% insalata conidta
+
 
 
 
@@ -30,6 +32,11 @@ b =300e-6; % buildings/m^2
 lambda=5e-6; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
+xd= [-3500 0 0 3500];
+yd= [0 -3500 3500 0];
+xd = transpose(xd);
+yd = transpose(yd);
+
 
 %Main
 numbPoints=poissrnd(areaTotale*lambda);%Poisson number of receiver
@@ -37,11 +44,8 @@ theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
 rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
 %Convert from polar to Cartesian coordinates
 [x,y]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
-figure
-pax = polaraxes;
-polarplot(theta,rho2,'d')
-pax.ThetaDir = 'counterclockwise';
-pax.FontSize = 12;
+
+
 D = pdist2([0 0], [x, y]);
 D = transpose(D);
 C = hypot(D,h_drone);
@@ -61,10 +65,17 @@ clear xForDisplay header
 x=x+xx0;
 y=y+yy0;
 
-
+% figure
+% for i=1:4
+%     circle(xd(i),yd(i),radius);
+% end
+% circle(0,0,radius);
+% hold on
+% scatter(x,y, 'd');
+% hold off
+% clear i;
 
 m=floor(D(:,2).*sqrt(a*b));
-numbPoints=size(m,1);
 prob_los=zeros(numbPoints,1);
 for i=1:numbPoints
     tmp=m(i);
@@ -88,10 +99,46 @@ P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 SNR = P_tx/P_N;
 
 figure
-gscatter(x,y,prob_los)
+subplot(1,2,1)
+% pax = polaraxes;
+polarplot(theta,rho2,'d')
+% pax.ThetaDir = 'counterclockwise';
+% pax.FontSize = 12;
+subplot(1,2,2)
+% figure
+for i=1:size(xd,1)
+    circle(xd(i),yd(i),radius);
+end
+circle(0,0,radius);
+hold on
+gscatter(x,y,prob_los);
+hold off
+clear i,
+
+for i=1:numbPoints
+    somm=1;
+    for k=1:size(xd,1)
+        dtmp = pdist2([x(i), y(i)], [xd(k), yd(k)]);
+        if dtmp<radius
+            dtmp = hypot(dtmp,h_drone);
+            dtmp = dtmp^(-eta_nl);
+            somm=somm*dtmp;
+        end
+    end
+    if somm==1
+        SIR(i,1)=0;
+    else
+        SIR(i,1)=((D(i,2))^(-eta_nl)/somm);
+    end
+end
+clear somm dtmp i k
+SINR = ((SNR.*SIR)./(SNR+SIR));
 
 % figure
 % [X,Y]=meshgrid(x,y);
 % Z=zeros(size(x));
 % Z=repmat(Z,1,numbPoints);
 % surf(X,Y,Z)
+
+
+
