@@ -2,16 +2,11 @@ clear all;
 close all;
 clc;
 
-
-
 % to do
 % altri droni (3.5km) ok
 % distanza droni ricev ok
 % formula sinr e sir ok
 % uplink e downlink
-
-
-
 
 % % Variables
 radius = 2000; %m approximated found by the given area on the pdf
@@ -44,8 +39,6 @@ theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
 rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
 %Convert from polar to Cartesian coordinates
 [x,y]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
-
-
 D = pdist2([0 0], [x, y]);
 D = transpose(D);
 C = hypot(D,h_drone);
@@ -65,16 +58,6 @@ clear xForDisplay header
 x=x+xx0;
 y=y+yy0;
 
-% figure
-% for i=1:4
-%     circle(xd(i),yd(i),radius);
-% end
-% circle(0,0,radius);
-% hold on
-% scatter(x,y, 'd');
-% hold off
-% clear i;
-
 m=floor(D(:,2).*sqrt(a*b));
 prob_los=zeros(numbPoints,1);
 for i=1:numbPoints
@@ -93,7 +76,6 @@ Xnlos = 1 + 10.*randn(numbPoints,1);
 pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
 pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
 path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
-
 P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
 SNR = P_tx/P_N;
@@ -139,6 +121,3 @@ SINR = ((SNR.*SIR)./(SNR+SIR));
 % Z=zeros(size(x));
 % Z=repmat(Z,1,numbPoints);
 % surf(X,Y,Z)
-
-
-
