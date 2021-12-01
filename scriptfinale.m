@@ -6,10 +6,8 @@ clc;
 %nanmean per media sinr/sir
 
 % to do
-% altri droni (3.5km) ok
-% distanza droni ricev ok
-% formula sinr e sir ok
 % uplink e downlink
+% coverage con soglia sinr soglia 15/20
 
 % % Variables
 radius = 2000; %m approximated found by the given area on the pdf
@@ -30,8 +28,9 @@ b =300e-6; % buildings/m^2
 lambda=5e-6; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
-xd= [-3500 0 0 3500];
-yd= [0 -3500 3500 0];
+cd=3500;
+xd= [-cd 0 0 cd];
+yd= [0 -cd cd 0];
 xd = transpose(xd);
 yd = transpose(yd);
 
@@ -67,7 +66,7 @@ clear C E F
 % D = [D,C,F];
 % clear C F
 figure('unit','normalized', 'position',[0.1 0.1 0.5 0.5])
-t=uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi'},'unit','normalized', 'Position', [0 0 1 1]);
+uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi'},'unit','normalized', 'Position', [0 0 1 1]);
 %Shift centre of disk to (xx0,yy0)
 x=x+xx0;
 y=y+yy0;
@@ -84,7 +83,7 @@ for i=1:numbPoints
     prob_los(i)=plostmp;
 end
 clear plostmp plostmp1 tmp i k
-
+%freezer dragon ball
 Xlos = 1 + 2.88.*randn(numbPoints,1);
 Xnlos = 1 + 10.*randn(numbPoints,1);
 pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
@@ -106,12 +105,15 @@ for i=1:size(xd,1)
 end
 circle(0,0,radius);
 hold on
-gscatter(x,y,prob_los);
 scatter(xx,yy,'d');
-scatter(xd,yd,'h', 'filled','red');
-scatter(0,0,'h', 'filled','red');
+scatter(xd,yd,100,'p', 'filled','red');
+scatter(0,0,100,'p', 'filled','red');
+cmap = hsv(11);
+gscatter(x,y,prob_los,cmap);
+% colormap(sort(cmap, 'descend'));
+% colorbar;
 hold off
-clear i,
+clear i xx yy
 
 SIR=zeros(numbPoints,1);
 for i=1:numbPoints
@@ -120,8 +122,9 @@ for i=1:numbPoints
         dtmp = pdist2([x(i), y(i)], [xd(k), yd(k)]);
         if dtmp<radius
             dtmp = hypot(dtmp,h_drone);
-            dtmp = dtmp^(-eta_nl);
-            somm=somm*dtmp;
+%             dtmp = dtmp^(-eta_nl);
+%             somm=somm*dtmp;
+            somm
         end
     end
     if somm==1
@@ -132,7 +135,7 @@ for i=1:numbPoints
 end
 clear somm dtmp i k
 SINR = ((SNR.*SIR)./(SNR+SIR));
-% 
+ 
 
 % figure
 % [X,Y]=meshgrid(x,y);
