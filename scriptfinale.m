@@ -2,6 +2,9 @@ clear all;
 close all;
 clc;
 
+
+%nanmean per media sinr/sir
+
 % to do
 % altri droni (3.5km) ok
 % distanza droni ricev ok
@@ -34,7 +37,22 @@ yd = transpose(yd);
 
 
 %Main
-numbPoints=poissrnd(areaTotale*lambda);%Poisson number of receiver
+numbPoints=poissrnd(areaTotale*lambda);
+xx=[];
+yy=[];
+for i=1:size(xd,1)
+    theta=2*pi*(rand(numbPoints,1));
+    rho2=radius*sqrt(rand(numbPoints,1));
+    [x,y]=pol2cart(theta,rho2);
+    xtmp=x-xd(i);
+    ytmp=y-yd(i);
+    xx= vertcat(xx,xtmp);
+    yy= vertcat(yy,ytmp);
+    numbPoints=poissrnd(areaTotale*lambda);
+end
+clear xtmp ytmp i
+
+% numbPoints=poissrnd(areaTotale*lambda);%Poisson number of receiver
 theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
 rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
 %Convert from polar to Cartesian coordinates
@@ -42,18 +60,14 @@ rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
 D = pdist2([0 0], [x, y]);
 D = transpose(D);
 C = hypot(D,h_drone);
-ThetaRad = asin(h_drone./C); %elevation angle
+E = asin(h_drone./C); %elevation angle
 F = asind(h_drone./C);
-% D = [D,C,E,F];
-% clear C E F
-% header = {'Raggio','Distanza','Theta in Radianti','Theta in Gradi'};
-D = [D,C,F];
-clear C F
-header = {'Raggio','Distanza','Theta in Gradi'};
-xForDisplay = [header; num2cell(D)];
-figure
-uitable('Data', xForDisplay);
-clear xForDisplay header
+D = [D,C,E,F];
+clear C E F
+% D = [D,C,F];
+% clear C F
+figure('unit','normalized', 'position',[0.1 0.1 0.5 0.5])
+t=uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi'},'unit','normalized', 'Position', [0 0 1 1]);
 %Shift centre of disk to (xx0,yy0)
 x=x+xx0;
 y=y+yy0;
@@ -80,20 +94,22 @@ P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
 SNR = P_tx/P_N;
 
-figure
+figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
 % pax = polaraxes;
 polarplot(theta,rho2,'d')
 % pax.ThetaDir = 'counterclockwise';
 % pax.FontSize = 12;
 subplot(1,2,2)
-% figure
 for i=1:size(xd,1)
     circle(xd(i),yd(i),radius);
 end
 circle(0,0,radius);
 hold on
 gscatter(x,y,prob_los);
+scatter(xx,yy,'d');
+scatter(xd,yd,'h', 'filled','red');
+scatter(0,0,'h', 'filled','red');
 hold off
 clear i,
 
@@ -109,13 +125,14 @@ for i=1:numbPoints
         end
     end
     if somm==1
-        SIR(i,1)=0;
+        SIR(i,1)=NaN;
     else
         SIR(i,1)=((D(i,2))^(-eta_nl)/somm);
     end
 end
 clear somm dtmp i k
 SINR = ((SNR.*SIR)./(SNR+SIR));
+% 
 
 % figure
 % [X,Y]=meshgrid(x,y);
