@@ -97,6 +97,7 @@ gscatter(x,y,prob_los);
 hold off
 clear i,
 
+SIR=zeros(numbPoints,1);
 for i=1:numbPoints
     somm=1;
     for k=1:size(xd,1)
