@@ -25,7 +25,7 @@ P_tx = 0.063; % dbm
 P_N = 2;
 a = 0.3;
 b =300e-6; % buildings/m^2
-lambda=5e-6; % u/m big area little lambda
+lambda=1e-5; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
 cd=3500;
@@ -117,24 +117,46 @@ clear i xx yy
 
 SIR=zeros(numbPoints,1);
 for i=1:numbPoints
-    somm=1;
+%     somm=1;
+    sommp=1;
+    sommpl=1;
     for k=1:size(xd,1)
         dtmp = pdist2([x(i), y(i)], [xd(k), yd(k)]);
         if dtmp<radius
             dtmp = hypot(dtmp,h_drone);
 %             dtmp = dtmp^(-eta_nl);
 %             somm=somm*dtmp;
-            somm
+            sommp=prob_los(i)*dtmp^(-eta_l);
+            sommpl=(1-prob_los(i))*dtmp^(-eta_nl);
         end
     end
-    if somm==1
+%     if somm==1
+%         SIR(i,1)=NaN;
+%     else
+%         SIR(i,1)=((D(i,2))^(-eta_nl)/somm);
+%     end    
+    if sommp==1 && sommpl==1
         SIR(i,1)=NaN;
     else
-        SIR(i,1)=((D(i,2))^(-eta_nl)/somm);
+        SIR(i,1)=(((prob_los(i)*(D(i,2)))^(-eta_l))+((1-prob_los(i))*(D(i,2)))^(-eta_nl))/(sommp+sommpl);
     end
 end
-clear somm dtmp i k
+clear somm dtmp i k sommp sommpl
 SINR = ((SNR.*SIR)./(SNR+SIR));
+
+% SINR_soglia
+P_rx_soglia = 1e4;
+count=0;
+for i=1:numbPoints
+    if P_rx(i)>=P_rx_soglia
+        count=count+1;
+    end
+end
+Prob_soglia=count/numbPoints;
+polarfun = @(theta,r) r*Prob_soglia;
+Coverage = (1/(pi*radius^2))*integral2(polarfun,0,2*pi,0,radius);
+
+clear i count Prob_soglia polarfun ans
  
 
 % figure
