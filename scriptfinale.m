@@ -14,14 +14,14 @@ radius = 2000; %m approximated found by the given area on the pdf
 xx0 = 0;
 yy0 = 0;
 areaTotale=pi*radius^2; 
-h_drone = 1000;
+h_drone = 320;
 h_ric=0;
 G_tx = 4;
 G_rx = 2;
 freq = 2.4*10^9;
 c = physconst('lightspeed');
 wavelenght= c/freq;
-P_tx = 0.063; % dbm
+P_tx = 0.063; %18 dbm
 P_N = 2;
 a = 0.3;
 b =300e-6; % buildings/m^2
@@ -77,12 +77,13 @@ for i=1:numbPoints
     tmp=m(i);
     plostmp=1;
     for k=0:tmp
-    plostmp1=1-exp(-((((h_drone-(k+0.5)*(h_drone+h_ric))/(tmp+1))^2)/(2*(15^2))));
-    plostmp=plostmp1*plostmp;
+        plostmp1=1-exp(-((((h_drone-(k+0.5)*(h_drone+h_ric))/(tmp+1))^2)/(2*(15^2))));
+        plostmp=plostmp1*plostmp;
     end
     prob_los(i)=plostmp;
 end
 clear plostmp plostmp1 tmp i k
+
 %freezer dragon ball
 Xlos = 1 + 2.88.*randn(numbPoints,1);
 Xnlos = 1 + 10.*randn(numbPoints,1);
@@ -92,6 +93,10 @@ path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
 P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
 SNR = P_tx/P_N;
+
+path_loss_lin=10.^(path_loss./10);
+% proval=db2mag(path_loss);
+P_rx_pulita=P_tx-path_loss_lin;
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
