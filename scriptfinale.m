@@ -24,12 +24,16 @@ freq = 2.4*10^9;
 c = physconst('lightspeed');
 wavelenght= c/freq;
 P_tx = 0.063; %18 dbm
+P_tx_dB = 10*log10(P_tx);
 P_N = 2;
 a = 0.3;
 b =300e-6; % buildings/m^2
 lambda=1e-5; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
+crowns=20;
+crowns_radius= radius/crowns;
+power_percent=100/crowns;
 cd=3500;
 xd= [-cd 0 0 cd];
 yd= [0 -cd cd 0];
@@ -59,16 +63,34 @@ rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
 %Convert from polar to Cartesian coordinates
 [x,y]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
 D = pdist2([0 0], [x, y]);
-D = transpose(D);
+D = transpose(D); %^raggio
 C = hypot(D,h_drone);
 E = asin(h_drone./C); %elevation angle
 F = asind(h_drone./C);
-D = [D,C,E,F];
-clear C E F
+
+for i=1:numbPoints
+    rangeinf=0;
+    rangesup=crowns_radius;
+    for k=1:crowns
+        if (D(i)>=rangeinf) & (D(i)<rangesup)
+            G(i)=(100-((k-1)*power_percent));
+            break
+        else
+            rangeinf=rangeinf+crowns_radius;
+            rangesup=rangesup+crowns_radius;
+        end
+%         disp('Error in power calculation');
+    end
+% 
+end
+G = transpose(G);
+
+D = [D,C,E,F,G];
+clear C E F G
 % D = [D,C,F];
 % clear C F
 figure('unit','normalized', 'position',[0.1 0.1 0.5 0.5])
-uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi'},'unit','normalized', 'Position', [0 0 1 1]);
+uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi','Antenna gain %'},'unit','normalized', 'Position', [0 0 1 1]);
 %Shift centre of disk to (xx0,yy0)
 x=x+xx0;
 y=y+yy0;
@@ -102,7 +124,8 @@ SNR = P_tx/P_N;
 path_loss_lin=10.^(path_loss./10);
 % proval=db2mag(path_loss);
 % P_rx_pulita=P_tx-path_loss_lin;
-P_rx_pulita=18-path_loss+G_tx_dB+G_rx_dB;
+prova=(G_tx_dB.*(D(:,5)./100));
+P_rx_pulita=P_tx_dB-path_loss+prova+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
