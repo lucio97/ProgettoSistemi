@@ -16,8 +16,10 @@ yy0 = 0;
 areaTotale=pi*radius^2; 
 h_drone = 320;
 h_ric=0;
-G_tx = 4;
-G_rx = 2;
+G_tx = 100; 
+G_tx_dB = 10*log10(G_tx);
+G_rx = 1;
+G_rx_dB = 10*log10(G_rx);
 freq = 2.4*10^9;
 c = physconst('lightspeed');
 wavelenght= c/freq;
@@ -94,9 +96,14 @@ P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
 SNR = P_tx/P_N;
 
+% creare ca. 20 corone in cui si perdono dB man mano che ci si allontana
+% dal centro
+
 path_loss_lin=10.^(path_loss./10);
 % proval=db2mag(path_loss);
-P_rx_pulita=P_tx-path_loss_lin;
+% P_rx_pulita=P_tx-path_loss_lin;
+P_rx_pulita=18-path_loss+G_tx_dB+G_rx_dB;
+P_rx_pulita_lin=10.^(P_rx_pulita./10);
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
@@ -150,10 +157,10 @@ clear somm dtmp i k sommp sommpl
 SINR = ((SNR.*SIR)./(SNR+SIR));
 
 % SINR_soglia
-P_rx_soglia = 1e4;
+P_rx_soglia = 5e-13;
 count=0;
 for i=1:numbPoints
-    if P_rx(i)>=P_rx_soglia
+    if P_rx_pulita_lin(i)>=P_rx_soglia
         count=count+1;
     end
 end
