@@ -6,8 +6,8 @@ clc;
 %nanmean per media sinr/sir
 
 % to do
-% uplink e downlink
-% coverage con soglia sinr soglia 15/20
+% uplink e prob. di fuori servizio con solgia si SINR
+% 
 
 % % Variables
 radius = 2000; %m approximated found by the given area on the pdf
@@ -25,7 +25,7 @@ c = physconst('lightspeed');
 wavelenght= c/freq;
 P_tx = 0.063; %18 dbm
 P_tx_dB = 10*log10(P_tx);
-P_N = 2;
+P_N = 2;  %3 dB
 a = 0.3;
 b =300e-6; % buildings/m^2
 lambda=1e-5; % u/m big area little lambda
@@ -68,6 +68,16 @@ C = hypot(D,h_drone);
 E = asin(h_drone./C); %elevation angle
 F = asind(h_drone./C);
 
+phi_3dB=70; %gradi ho messo la b grande
+A_m=25; %sono decibel
+theta_3dB=10; %
+SLA_v=20;
+
+A_h=-min((12.*((90-F)./phi_3dB).^2), A_m);
+Theta=90-F;
+theta_b=90;
+A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v); %da finire
+
 for i=1:numbPoints
     rangeinf=0;
     rangesup=crowns_radius;
@@ -75,14 +85,16 @@ for i=1:numbPoints
         if (D(i)>=rangeinf) & (D(i)<rangesup)
             G(i)=(100-((k-1)*power_percent));
             break
+        elseif k==crowns
+            disp('Error in power calculation');
         else
             rangeinf=rangeinf+crowns_radius;
             rangesup=rangesup+crowns_radius;
         end
-%         disp('Error in power calculation');
     end
 % 
 end
+clear i k rangeinf rangesup
 G = transpose(G);
 
 D = [D,C,E,F,G];
@@ -132,6 +144,8 @@ figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
 % pax = polaraxes;
 polarplot(theta,rho2,'d')
+% rticks([crowns_radius 2*crowns_radius 3*crowns_radius 4*crowns_radius 5*crowns_radius 6*crowns_radius  7*crowns_radius 8*crowns_radius 9*crowns_radius 10*crowns_radius 11*crowns_radius 12*crowns_radius 13*crowns_radius 14*crowns_radius 15*crowns_radius 16*crowns_radius 17*crowns_radius 18*crowns_radius 19*crowns_radius 20*crowns_radius])
+% rticklabels({'', '', '', '', 500, '', '', '', '', 1000, '', '', '', '', 1500, '', 1700, '', '', 2000})
 % pax.ThetaDir = 'counterclockwise';
 % pax.FontSize = 12;
 subplot(1,2,2)
