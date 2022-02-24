@@ -131,10 +131,6 @@ path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
 P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
 
-% Uplink
-
-
-
 % creare ca. 20 corone in cui si perdono dB man mano che ci si allontana
 % dal centro
 
@@ -145,6 +141,14 @@ prova=(G_tx_dB.*(D(:,5)./100));
 P_rx_pulita=P_tx_dB-path_loss+prova+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 SNR = P_rx_pulita_lin/P_N;
+
+% UpLink/ in salita emilio vibes
+
+freq_up=freq/10;
+wavelenght_up=c/freq_up;
+%copiati la formula di prx da sopra grazie
+P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up/4*pi*D(:,2)).^2;
+SNR_up= P_rx_up/P_N;
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
