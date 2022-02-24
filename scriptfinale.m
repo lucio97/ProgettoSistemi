@@ -3,7 +3,7 @@ close all;
 clc;
 
 
-%nanmean per media sinr/sir
+% nanmean per media sinr/sir
 
 % to do
 % uplink e prob. di fuori servizio con solgia si SINR
@@ -76,7 +76,9 @@ SLA_v=20;
 A_h=-min((12.*((90-F)./phi_3dB).^2), A_m);
 Theta=90-F;
 theta_b=90;
-A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v); %da finire
+A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v); %da finire pd
+A_fin=-min((-A_h-A_v), A_m);
+G_tfin=A_fin+G_tx_dB;
 
 for i=1:numbPoints
     rangeinf=0;
@@ -128,7 +130,10 @@ pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
 path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
 P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
 % mediaP_rx = mean(P_rx);
-SNR = P_tx/P_N;
+
+% Uplink
+
+
 
 % creare ca. 20 corone in cui si perdono dB man mano che ci si allontana
 % dal centro
@@ -139,6 +144,7 @@ path_loss_lin=10.^(path_loss./10);
 prova=(G_tx_dB.*(D(:,5)./100));
 P_rx_pulita=P_tx_dB-path_loss+prova+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
+SNR = P_rx_pulita_lin/P_N;
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
