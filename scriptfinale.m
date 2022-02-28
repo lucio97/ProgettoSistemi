@@ -76,7 +76,7 @@ SLA_v=20;
 A_h=-min((12.*((90-F)./phi_3dB).^2), A_m);
 Theta=90-F;
 theta_b=90;
-A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v); %da finire pd
+A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v); %da finire 
 A_fin=-min((-A_h-A_v), A_m);
 G_tfin=A_fin+G_tx_dB;
 
@@ -128,7 +128,7 @@ Xnlos = 1 + 10.*randn(numbPoints,1);
 pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
 pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
 path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
-P_rx = P_tx*G_tx*G_rx*(wavelenght/4*pi*D(:,2)).^2;
+P_rx = P_tx*G_tx*G_rx*(wavelenght./(4*pi*D(:,2))).^2;
 % mediaP_rx = mean(P_rx);
 
 % creare ca. 20 corone in cui si perdono dB man mano che ci si allontana
@@ -144,10 +144,10 @@ SNR = P_rx_pulita_lin/P_N;
 
 % UpLink/ in salita emilio vibes
 
-freq_up=freq/10;
+freq_up=2*10^9;
 wavelenght_up=c/freq_up;
 %copiati la formula di prx da sopra grazie
-P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up/4*pi*D(:,2)).^2;
+P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
 SNR_up= P_rx_up/P_N;
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
