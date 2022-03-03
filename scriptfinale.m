@@ -137,18 +137,10 @@ P_rx = P_tx*G_tx*G_rx*(wavelenght./(4*pi*D(:,2))).^2;
 path_loss_lin=10.^(path_loss./10);
 % proval=db2mag(path_loss);
 % P_rx_pulita=P_tx-path_loss_lin;
-prova=(G_tx_dB.*(D(:,5)./100));
-P_rx_pulita=P_tx_dB-path_loss+prova+G_rx_dB;
+% prova=(G_tx_dB.*(D(:,5)./100));
+P_rx_pulita=P_tx_dB-path_loss+G_tfin+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 SNR = P_rx_pulita_lin/P_N;
-
-% UpLink/ in salita emilio vibes
-
-freq_up=2*10^9;
-wavelenght_up=c/freq_up;
-%copiati la formula di prx da sopra grazie
-P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
-SNR_up= P_rx_up/P_N;
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
@@ -216,6 +208,18 @@ polarfun = @(theta,r) r*Prob_soglia;
 Coverage = (1/(pi*radius^2))*integral2(polarfun,0,2*pi,0,radius);
 
 clear i count Prob_soglia polarfun ans
+
+% UpLink/ in salita emilio vibes
+
+freq_up=2*10^9;
+wavelenght_up=c/freq_up;
+%copiati la formula di prx da sopra grazie
+P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
+P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % ipotizziamno dispositivi al suolo siano tutti direzionati verso il drone
+P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
+SNR_up= P_rx_pulita_lin_up/P_N;
+SIR_up=1/numbPoints; % perchè lo dice savino/ distanza dispositivi suolo-drone è uguale a distanza dispositivi interferenti drone. direzionari verso drone
+SINR_up=(SNR_up.*SIR_up)./(SNR_up+SIR_up);
  
 
 % figure
