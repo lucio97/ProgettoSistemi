@@ -3,10 +3,10 @@ close all;
 clc;
 
 
-% nanmean per media sinr/sir
+
 
 % to do
-% uplink e prob. di fuori servizio con solgia si SINR
+% prob. di fuori servizio con solgia si SINR
 % 
 
 % % Variables
@@ -20,6 +20,7 @@ G_tx = 100;
 G_tx_dB = 10*log10(G_tx);
 G_rx = 1;
 G_rx_dB = 10*log10(G_rx);
+B_signal=2*10^7;
 freq = 2.4*10^9;
 c = physconst('lightspeed');
 wavelenght= c/freq;
@@ -141,6 +142,7 @@ path_loss_lin=10.^(path_loss./10);
 P_rx_pulita=P_tx_dB-path_loss+G_tfin+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 SNR = P_rx_pulita_lin/P_N;
+Capacity=B_signal*log2(SNR+1);
 
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
@@ -220,10 +222,35 @@ P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
 SNR_up= P_rx_pulita_lin_up/P_N;
 SIR_up=1/numbPoints; % perchè lo dice savino/ distanza dispositivi suolo-drone è uguale a distanza dispositivi interferenti drone. direzionari verso drone
 SINR_up=(SNR_up.*SIR_up)./(SNR_up+SIR_up);
+Capacity_up=B_signal*log2(SNR_up+1);
+
+% media sinr/sir
+media_SIR = mean(SIR,'omitnan');
+media_SINR = mean(SINR,'omitnan');
+media_SIR_up = mean(SIR_up,'omitnan');
+media_SINR_up = mean(SINR_up,'omitnan');
+
+% Probabilità fuori servizio
+pr_outage_threshold=10^-16;
+count=0;
+for i=1:numbPoints
+    if P_rx_pulita_lin(i)<pr_outage_threshold
+        count=count+1;
+    end
+end
+pr_outage=(count/numbPoints)*100; %leo voleva la percentuale se no non era contento
+clear i count pr_outage_threshold
  
 
-% figure
-% [X,Y]=meshgrid(x,y);
-% Z=zeros(size(x));
-% Z=repmat(Z,1,numbPoints);
-% surf(X,Y,Z)
+figure
+% hold on
+[X,Y]=meshgrid(x,y);
+Z=zeros(size(x));
+Z=repmat(Z,1,numbPoints);
+plot3(x,y,Z,'d');
+% x=[-1750:100:1750];
+% y=[-1750:100:1750];
+% [xx,yy]=meshgrid(x,y);
+% zz=xx+(2*xx.*yy.^2)+3*xx; % HERE
+% surf(xx,yy,zz);
+% hold off
