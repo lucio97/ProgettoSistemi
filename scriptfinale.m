@@ -30,7 +30,7 @@ eta_nl=3;
 crowns=20;
 crowns_radius= radius/crowns;
 power_percent=100/crowns;
-cd=3500;
+cd=2*radius-(radius/4);
 xd= [-cd 0 0 cd];
 yd= [0 -cd cd 0];
 xd = transpose(xd);
@@ -76,7 +76,7 @@ A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v);
 A_fin=-min((-A_h-A_v), A_m);
 G_tfin=A_fin+G_tx_dB;
 
-%iph: decreased power over distance 
+%hyp: decreased power over distance 
 %creation of 20 crowns, more distance more dB decreased
 for i=1:numbPoints
     rangeinf=0;
@@ -115,17 +115,17 @@ for i=1:numbPoints
     end
     prob_los(i)=plostmp;
 end
-clear plostmp plostmp1 tmp i k
+clear plostmp plostmp1 tmp i k m
 
 %freezer dragon ball
 Xlos = 1 + 2.88.*randn(numbPoints,1);
 Xnlos = 1 + 10.*randn(numbPoints,1);
 pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
 pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
-path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
+path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos); %Average path loss w/o considering gains
 P_rx = P_tx*G_tx*G_rx*(wavelenght./(4*pi*D(:,2))).^2;
 path_loss_lin=10.^(path_loss./10);
-% GuadagnoCrowns=(G_tx_dB.*(D(:,5)./100));
+CrownsGain_tx_hyp=(G_tx_dB.*(D(:,5)./100)); 
 P_rx_pulita=P_tx_dB-path_loss+G_tfin+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 SNR = P_rx_pulita_lin/P_N;
@@ -193,10 +193,10 @@ clear i count Prob_threshold polarfun ans
 freq_up=2*10^9;
 wavelenght_up=c/freq_up;
 P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
-P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % ipotizziamno dispositivi al suolo siano tutti direzionati verso il drone
+P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % hyp on-ground devices look at the drone
 P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
 SNR_up= P_rx_pulita_lin_up/P_N;
-SIR_up=1/numbPoints; % perchè lo dice savino/ distanza dispositivi suolo-drone è uguale a distanza dispositivi interferenti drone. direzionari verso drone
+SIR_up=1/numbPoints; % perchè lo dice savino/ distance devices ground-drone is the same as the interfeering devices w/ drone. devices look at the drone
 SINR_up=(SNR_up.*SIR_up)./(SNR_up+SIR_up);
 Capacity_up=B_signal*log2(SNR_up+1);
 
@@ -217,6 +217,11 @@ end
 pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no non era contento
 clear i count pr_outage_threshold
  
+P_rx_pulita_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
+Emilio=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
+EmilioMin=min(Emilio);
+EmilioMax=max(Emilio);
+EmilioMean=mean(Emilio);
 
 % figure
 % % hold on
