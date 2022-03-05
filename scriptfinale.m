@@ -1,13 +1,8 @@
+% I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
+
 clear all;
 close all;
 clc;
-
-
-
-
-% to do
-% prob. di fuori servizio con solgia si SINR
-% 
 
 % % Variables
 radius = 2000; %m approximated found by the given area on the pdf
@@ -43,7 +38,7 @@ yd = transpose(yd);
 
 
 %Main
-numbPoints=poissrnd(areaTotale*lambda);
+numbPoints=poissrnd(areaTotale*lambda); %Poisson number of receiver
 xx=[];
 yy=[];
 for i=1:size(xd,1)
@@ -58,9 +53,9 @@ for i=1:size(xd,1)
 end
 clear xtmp ytmp i
 
-% numbPoints=poissrnd(areaTotale*lambda);%Poisson number of receiver
 theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
 rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
+
 %Convert from polar to Cartesian coordinates
 [x,y]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
 D = pdist2([0 0], [x, y]);
@@ -69,18 +64,20 @@ C = hypot(D,h_drone);
 E = asin(h_drone./C); %elevation angle
 F = asind(h_drone./C);
 
-phi_3dB=70; %gradi ho messo la b grande
-A_m=25; %sono decibel
-theta_3dB=10; %
+phi_3dB=70;
+A_m=25; %dB
+theta_3dB=10;
 SLA_v=20;
 
 A_h=-min((12.*((90-F)./phi_3dB).^2), A_m);
 Theta=90-F;
 theta_b=90;
-A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v); %da finire 
+A_v=-min((12.*((Theta-theta_b)./theta_3dB).^2), SLA_v);
 A_fin=-min((-A_h-A_v), A_m);
 G_tfin=A_fin+G_tx_dB;
 
+%iph: decreased power over distance 
+%creation of 20 crowns, more distance more dB decreased
 for i=1:numbPoints
     rangeinf=0;
     rangesup=crowns_radius;
@@ -95,18 +92,15 @@ for i=1:numbPoints
             rangesup=rangesup+crowns_radius;
         end
     end
-% 
 end
 clear i k rangeinf rangesup
 G = transpose(G);
 
 D = [D,C,E,F,G];
 clear C E F G
-% D = [D,C,F];
-% clear C F
 figure('unit','normalized', 'position',[0.1 0.1 0.5 0.5])
 uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi','Antenna gain %'},'unit','normalized', 'Position', [0 0 1 1]);
-%Shift centre of disk to (xx0,yy0)
+%Shift centre of circle to (xx0,yy0)
 x=x+xx0;
 y=y+yy0;
 
@@ -130,28 +124,20 @@ pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
 pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
 path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos);
 P_rx = P_tx*G_tx*G_rx*(wavelenght./(4*pi*D(:,2))).^2;
-% mediaP_rx = mean(P_rx);
-
-% creare ca. 20 corone in cui si perdono dB man mano che ci si allontana
-% dal centro
-
 path_loss_lin=10.^(path_loss./10);
-% proval=db2mag(path_loss);
-% P_rx_pulita=P_tx-path_loss_lin;
-% prova=(G_tx_dB.*(D(:,5)./100));
+% GuadagnoCrowns=(G_tx_dB.*(D(:,5)./100));
 P_rx_pulita=P_tx_dB-path_loss+G_tfin+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 SNR = P_rx_pulita_lin/P_N;
 Capacity=B_signal*log2(SNR+1);
+mediaP_rx = mean(P_rx);
 
+%display stations in two different images
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
 subplot(1,2,1)
-% pax = polaraxes;
 polarplot(theta,rho2,'d')
-% rticks([crowns_radius 2*crowns_radius 3*crowns_radius 4*crowns_radius 5*crowns_radius 6*crowns_radius  7*crowns_radius 8*crowns_radius 9*crowns_radius 10*crowns_radius 11*crowns_radius 12*crowns_radius 13*crowns_radius 14*crowns_radius 15*crowns_radius 16*crowns_radius 17*crowns_radius 18*crowns_radius 19*crowns_radius 20*crowns_radius])
-% rticklabels({'', '', '', '', 500, '', '', '', '', 1000, '', '', '', '', 1500, '', 1700, '', '', 2000})
-% pax.ThetaDir = 'counterclockwise';
-% pax.FontSize = 12;
+rticks([crowns_radius 2*crowns_radius 3*crowns_radius 4*crowns_radius 5*crowns_radius 6*crowns_radius  7*crowns_radius 8*crowns_radius 9*crowns_radius 10*crowns_radius 11*crowns_radius 12*crowns_radius 13*crowns_radius 14*crowns_radius 15*crowns_radius 16*crowns_radius 17*crowns_radius 18*crowns_radius 19*crowns_radius 20*crowns_radius])
+rticklabels({'', '', '', '', '500m', '', '', '', '', '1000m', '', '', '', '', '1500m', '', '1700m', '', '', '2000m'})
 subplot(1,2,2)
 for i=1:size(xd,1)
     circle(xd(i),yd(i),radius);
@@ -163,31 +149,22 @@ scatter(xd,yd,100,'p', 'filled','red');
 scatter(0,0,100,'p', 'filled','red');
 cmap = hsv(11);
 gscatter(x,y,prob_los,cmap);
-% colormap(sort(cmap, 'descend'));
-% colorbar;
 hold off
 clear i xx yy
 
 SIR=zeros(numbPoints,1);
+%  SIR and SINR computation
 for i=1:numbPoints
-%     somm=1;
     sommp=1;
     sommpl=1;
     for k=1:size(xd,1)
         dtmp = pdist2([x(i), y(i)], [xd(k), yd(k)]);
         if dtmp<radius
             dtmp = hypot(dtmp,h_drone);
-%             dtmp = dtmp^(-eta_nl);
-%             somm=somm*dtmp;
             sommp=prob_los(i)*dtmp^(-eta_l);
             sommpl=(1-prob_los(i))*dtmp^(-eta_nl);
         end
     end
-%     if somm==1
-%         SIR(i,1)=NaN;
-%     else
-%         SIR(i,1)=((D(i,2))^(-eta_nl)/somm);
-%     end    
     if sommp==1 && sommpl==1
         SIR(i,1)=NaN;
     else
@@ -197,25 +174,24 @@ end
 clear somm dtmp i k sommp sommpl
 SINR = ((SNR.*SIR)./(SNR+SIR));
 
-% SINR_soglia
-P_rx_soglia = 5e-13;
+% SINR_threshold
+P_rx_threshold = 5e-13;
 count=0;
 for i=1:numbPoints
-    if P_rx_pulita_lin(i)>=P_rx_soglia
+    if P_rx_pulita_lin(i)>=P_rx_threshold
         count=count+1;
     end
 end
-Prob_soglia=count/numbPoints;
-polarfun = @(theta,r) r*Prob_soglia;
+Prob_threshold=count/numbPoints;
+polarfun = @(theta,r) r*Prob_threshold;
 Coverage = (1/(pi*radius^2))*integral2(polarfun,0,2*pi,0,radius);
 
-clear i count Prob_soglia polarfun ans
+clear i count Prob_threshold polarfun ans
 
-% UpLink/ in salita emilio vibes
+% UpLink/ in salita emilio matricciani vibes
 
 freq_up=2*10^9;
 wavelenght_up=c/freq_up;
-%copiati la formula di prx da sopra grazie
 P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
 P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % ipotizziamno dispositivi al suolo siano tutti direzionati verso il drone
 P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
@@ -224,13 +200,13 @@ SIR_up=1/numbPoints; % perchè lo dice savino/ distanza dispositivi suolo-drone 
 SINR_up=(SNR_up.*SIR_up)./(SNR_up+SIR_up);
 Capacity_up=B_signal*log2(SNR_up+1);
 
-% media sinr/sir
+% mean sinr/sir
 media_SIR = mean(SIR,'omitnan');
 media_SINR = mean(SINR,'omitnan');
 media_SIR_up = mean(SIR_up,'omitnan');
 media_SINR_up = mean(SINR_up,'omitnan');
 
-% Probabilità fuori servizio
+% outage probability
 pr_outage_threshold=10^-16;
 count=0;
 for i=1:numbPoints
@@ -238,19 +214,19 @@ for i=1:numbPoints
         count=count+1;
     end
 end
-pr_outage=(count/numbPoints)*100; %leo voleva la percentuale se no non era contento
+pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no non era contento
 clear i count pr_outage_threshold
  
 
-figure
-% hold on
-[X,Y]=meshgrid(x,y);
-Z=zeros(size(x));
-Z=repmat(Z,1,numbPoints);
-plot3(x,y,Z,'d');
-% x=[-1750:100:1750];
-% y=[-1750:100:1750];
-% [xx,yy]=meshgrid(x,y);
-% zz=xx+(2*xx.*yy.^2)+3*xx; % HERE
-% surf(xx,yy,zz);
-% hold off
+% figure
+% % hold on
+% [X,Y]=meshgrid(x,y);
+% Z=zeros(size(x));
+% Z=repmat(Z,1,numbPoints);
+% plot3(x,y,Z,'d');
+% % x=[-1750:100:1750];
+% % y=[-1750:100:1750];
+% % [xx,yy]=meshgrid(x,y);
+% % zz=xx+(2*xx.*yy.^2)+3*xx; % HERE
+% % surf(xx,yy,zz);
+% % hold off
