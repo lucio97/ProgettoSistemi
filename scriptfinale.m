@@ -223,15 +223,17 @@ EmilioMin=min(Emilio);
 EmilioMax=max(Emilio);
 EmilioMean=mean(Emilio);
 
-% figure
-% % hold on
-% [X,Y]=meshgrid(x,y);
-% Z=zeros(size(x));
-% Z=repmat(Z,1,numbPoints);
-% plot3(x,y,Z,'d');
-% % x=[-1750:100:1750];
-% % y=[-1750:100:1750];
-% % [xx,yy]=meshgrid(x,y);
-% % zz=xx+(2*xx.*yy.^2)+3*xx; % HERE
-% % surf(xx,yy,zz);
-% % hold off
+figure
+[X,Y]=meshgrid(x,y);
+Z=zeros(size(x));
+Z=repmat(Z,1,numbPoints);
+plot3(x,y,Z,'d');
+hold on
+xlabel('x');
+ylabel('y');
+zlabel('z');
+img = imread('drone.png');% Load a sampleimage
+xImage = [-500 500; -500 500]; % The x data for the image corners
+yImage = [0 0; 0 0]; % The y data for the image corners
+zImage = [1000 1000; 500 500]; % The z data for the image corners
+surf(xImage,yImage,zImage,'CData',img,'FaceColor','texturemap'); % Plot the surface
