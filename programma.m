@@ -1,15 +1,14 @@
+function EmilioMean = programma(h_drone)
+
 % I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
 
-clear all;
-close all;
-clc;
+
 
 % % Variables
 radius = 2000; %m approximated found by the given area on the pdf
 xx0 = 0;
 yy0 = 0;
 areaTotale=pi*radius^2; 
-h_drone = 320;
 h_ric=0;
 G_tx = 100; 
 G_tx_dB = 10*log10(G_tx);
@@ -98,8 +97,8 @@ G = transpose(G);
 
 D = [D,C,E,F,G];
 clear C E F G
-figure('unit','normalized', 'position',[0.1 0.1 0.5 0.5])
-uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi','Antenna gain %'},'unit','normalized', 'Position', [0 0 1 1]);
+% figure('unit','normalized', 'position',[0.1 0.1 0.5 0.5])
+% uitable('Data', D, 'columnname', {'Raggio','Distanza','Theta in Radianti','Theta in Gradi','Antenna gain %'},'unit','normalized', 'Position', [0 0 1 1]);
 %Shift centre of circle to (xx0,yy0)
 x=x+xx0;
 y=y+yy0;
@@ -132,23 +131,23 @@ Capacity=B_signal*log2(SNR+1);
 mediaP_rx = mean(P_rx);
 
 %display stations in two different images
-figure('Name','Plots','NumberTitle','off','WindowState','maximized')
-subplot(1,2,1)
-polarplot(theta,rho2,'d')
-rticks([crowns_radius 2*crowns_radius 3*crowns_radius 4*crowns_radius 5*crowns_radius 6*crowns_radius  7*crowns_radius 8*crowns_radius 9*crowns_radius 10*crowns_radius 11*crowns_radius 12*crowns_radius 13*crowns_radius 14*crowns_radius 15*crowns_radius 16*crowns_radius 17*crowns_radius 18*crowns_radius 19*crowns_radius 20*crowns_radius])
-rticklabels({'', '', '', '', '500m', '', '', '', '', '1000m', '', '', '', '', '1500m', '', '1700m', '', '', '2000m'})
-subplot(1,2,2)
-for i=1:size(xd,1)
-    circle(xd(i),yd(i),radius);
-end
-circle(0,0,radius);
-hold on
-scatter(xx,yy,'d');
-scatter(xd,yd,100,'p', 'filled','red');
-scatter(0,0,100,'p', 'filled','red');
-cmap = hsv(11);
-gscatter(x,y,prob_los,cmap);
-hold off
+% figure('Name','Plots','NumberTitle','off','WindowState','maximized')
+% subplot(1,2,1)
+% polarplot(theta,rho2,'d')
+% rticks([crowns_radius 2*crowns_radius 3*crowns_radius 4*crowns_radius 5*crowns_radius 6*crowns_radius  7*crowns_radius 8*crowns_radius 9*crowns_radius 10*crowns_radius 11*crowns_radius 12*crowns_radius 13*crowns_radius 14*crowns_radius 15*crowns_radius 16*crowns_radius 17*crowns_radius 18*crowns_radius 19*crowns_radius 20*crowns_radius])
+% rticklabels({'', '', '', '', '500m', '', '', '', '', '1000m', '', '', '', '', '1500m', '', '1700m', '', '', '2000m'})
+% subplot(1,2,2)
+% for i=1:size(xd,1)
+%     circle(xd(i),yd(i),radius);
+% end
+% circle(0,0,radius);
+% hold on
+% scatter(xx,yy,'d');
+% scatter(xd,yd,100,'p', 'filled','red');
+% scatter(0,0,100,'p', 'filled','red');
+% cmap = hsv(11);
+% gscatter(x,y,prob_los,cmap);
+% hold off
 CoordExt = [xx yy];
 clear i xx yy
 
@@ -253,17 +252,17 @@ EmilioMean=mean(Emilio);
 % find drone altitude so that EmilioMean is ~1 
 
 
-figure
-[X,Y]=meshgrid(x,y);
-Z=zeros(size(x));
-Z=repmat(Z,1,numbPoints);
-plot3(x,y,Z,'d');
-hold on
-xlabel('x');
-ylabel('y');
-zlabel('z');
-img = imread('drone.png');% Load a sampleimage
-xImage = [-500 500; -500 500]; % The x data for the image corners
-yImage = [0 0; 0 0]; % The y data for the image corners
-zImage = [1000 1000; 500 500]; % The z data for the image corners
-surf(xImage,yImage,zImage,'CData',img,'FaceColor','texturemap'); % Plot the surface
+% figure
+% [X,Y]=meshgrid(x,y);
+% Z=zeros(size(x));
+% Z=repmat(Z,1,numbPoints);
+% plot3(x,y,Z,'d');
+% hold on
+% xlabel('x');
+% ylabel('y');
+% zlabel('z');
+% img = imread('drone.png');% Load a sampleimage
+% xImage = [-500 500; -500 500]; % The x data for the image corners
+% yImage = [0 0; 0 0]; % The y data for the image corners
+% zImage = [1000 1000; 500 500]; % The z data for the image corners
+% surf(xImage,yImage,zImage,'CData',img,'FaceColor','texturemap'); % Plot the surface
