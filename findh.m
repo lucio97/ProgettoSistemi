@@ -1,11 +1,15 @@
-i=1;
+clear all;
+close all;
+clc;
+lambda=1e-2;
+i=100;
 while 1
-    test=programma(i);
+    test=programma(i,lambda);
     ciao=[i,test];
     disp(ciao)
-    if test>0.5 & test< 1.5
+    i=i-1;
+    if i==0
         break
-    else
-        i=i+1;
     end
+    
 end

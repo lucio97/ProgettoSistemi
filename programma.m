@@ -1,13 +1,14 @@
-function EmilioMean = programma(h_drone)
+function EmilioMin = programma(radius, lambda)
 
 % I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
 
 
 
 % % Variables
-radius = 2000; %m approximated found by the given area on the pdf
+% radius = 2000; %m approximated found by the given area on the pdf
 xx0 = 0;
 yy0 = 0;
+h_drone=320;
 areaTotale=pi*radius^2; 
 h_ric=0;
 G_tx = 100; 
@@ -23,7 +24,7 @@ P_tx_dB = 10*log10(P_tx);
 P_N = 2;  %3 dB
 a = 0.3;
 b =300e-6; % buildings/m^2
-lambda=1e-5; % u/m big area little lambda
+% lambda=1; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
 crowns=20;
@@ -92,7 +93,7 @@ for i=1:numbPoints
         end
     end
 end
-clear i k rangeinf rangesup
+% clear i k rangeinf rangesup
 G = transpose(G);
 
 D = [D,C,E,F,G];
