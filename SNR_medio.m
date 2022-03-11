@@ -7,7 +7,7 @@ load('D:\OneDrive - Politecnico di Milano\Universita\VI Anno\Progetto Sistemi di
 % xx0 = 0;
 % yy0 = 0;
 % areaTotale=pi*radius^2; 
-h_drone = 1;
+h_drone = 20
 % h_ric=0;
 % G_tx = 100; 
 % G_tx_dB = 10*log10(G_tx);
@@ -139,6 +139,7 @@ subplot(1,2,2)
 for i=1:size(xd,1)
     circle(xd(i),yd(i),radius);
 end
+% CoordExt = [xx yy];
 circle(0,0,radius);
 hold on
 scatter(CoordExt(:,1), CoordExt(:,2),'d');
@@ -147,7 +148,6 @@ scatter(0,0,100,'p', 'filled','red');
 cmap = hsv(11);
 gscatter(x,y,prob_los,cmap);
 hold off
-% CoordExt = [xx yy];
 clear i
 
 SIR=zeros(numbPoints,1);
@@ -248,6 +248,8 @@ EmilioMin=min(Emilio);
 EmilioMax=max(Emilio);
 EmilioMean=mean(Emilio);
 snr_media=mean(SNR)
+snrmax=max(SNR)
+snrmin=min(SNR)
 
 % find drone altitude so that EmilioMean is ~1 
 
