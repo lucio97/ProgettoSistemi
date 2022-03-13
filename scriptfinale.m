@@ -5,7 +5,7 @@ close all;
 clc;
 
 % % Variables
-radius = 2000; %m approximated found by the given area on the pdf
+radius = 128; %m approximated found by the given area on the pdf
 xx0 = 0;
 yy0 = 0;
 areaTotale=pi*radius^2; 
@@ -24,7 +24,7 @@ P_tx_dB = 10*log10(P_tx);
 P_N = 2;  %3 dB
 a = 0.3;
 b =300e-6; % buildings/m^2
-lambda=1e-5; % u/m big area little lambda
+lambda=1e-2; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
 crowns=20;
@@ -129,7 +129,7 @@ P_rx_pulita=P_tx_dB-path_loss+G_tfin+G_rx_dB;
 P_rx_pulita_lin=10.^(P_rx_pulita./10);
 SNR = P_rx_pulita_lin/P_N;
 Capacity=B_signal*log2(SNR+1);
-mediaP_rx = mean(P_rx);
+meanP_rx = mean(P_rx);
 
 %display stations in two different images
 figure('Name','Plots','NumberTitle','off','WindowState','maximized')
@@ -228,10 +228,10 @@ Capacity_up=B_signal*log2(SNR_up+1);
 clear  i sommp sommpl sommt
 
 % mean sinr/sir
-media_SIR = mean(SIR,'omitnan');
-media_SINR = mean(SINR,'omitnan');
-media_SIR_up = mean(SIR_up,'omitnan');
-media_SINR_up = mean(SINR_up,'omitnan');
+mean_SIR = mean(SIR,'omitnan');
+mean_SINR = mean(SINR,'omitnan');
+mean_SIR_up = mean(SIR_up,'omitnan');
+mean_SINR_up = mean(SINR_up,'omitnan');
 
 % outage probability
 pr_outage_threshold=10^-16;
@@ -245,12 +245,12 @@ pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no 
 clear i count pr_outage_threshold
  
 P_rx_pulita_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
-Emilio=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
-EmilioMin=min(Emilio);
-EmilioMax=max(Emilio);
-EmilioMean=mean(Emilio);
+Rapporto=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
+RapportoMin=min(Rapporto);
+RapportoMax=max(Rapporto);
+RapportoMean=mean(Rapporto);
 
-% find drone altitude so that EmilioMean is ~1 
+% find drone altitude so that RapportoMean is ~1 
 
 
 figure

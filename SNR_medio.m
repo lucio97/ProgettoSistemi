@@ -1,13 +1,13 @@
 % I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
-
-load('D:\OneDrive - Politecnico di Milano\Universita\VI Anno\Progetto Sistemi di comunicazione\Screens\1 base\1.mat')
+function SNR = SNR_medio(h_drone)
+load('D:\OneDrive - Politecnico di Milano\Universita\VI Anno\Progetto Sistemi di comunicazione\Screens\1 base\1_nohdrone.mat')
 
 % % Variables
-% radius = 2000; %m approximated found by the given area on the pdf
+radius = 500; %m approximated found by the given area on the pdf
 % xx0 = 0;
 % yy0 = 0;
 % areaTotale=pi*radius^2; 
-h_drone = 20
+% h_drone = 640
 % h_ric=0;
 % G_tx = 100; 
 % G_tx_dB = 10*log10(G_tx);
@@ -231,6 +231,7 @@ media_SINR = mean(SINR,'omitnan');
 media_SIR_up = mean(SIR_up,'omitnan');
 media_SINR_up = mean(SINR_up,'omitnan');
 
+
 % outage probability
 pr_outage_threshold=10^-16;
 count=0;
@@ -247,10 +248,12 @@ Emilio=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
 EmilioMin=min(Emilio);
 EmilioMax=max(Emilio);
 EmilioMean=mean(Emilio);
-snr_media=mean(SNR)
-snrmax=max(SNR)
-snrmin=min(SNR)
+snr_media=mean(SNR);
+snrmax=max(SNR);
+snrmin=min(SNR);
 
+jff=[snrmin, snr_media, snrmax];
+% disp(jff)
 % find drone altitude so that EmilioMean is ~1 
 
 
