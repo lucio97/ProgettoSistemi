@@ -2,8 +2,8 @@ clear all;
 close all;
 clc;
 lambda=1e-2;
-i=100;
-h_max=20;
+
+h_max=220;
 for i=h_max:-0.5:0
     test=programma(i,lambda);
     ciao=[i,test];
@@ -209,8 +209,8 @@ P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
 P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % hyp on-ground devices look at the drone
 P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
 SNR_up= P_rx_pulita_lin_up/P_N;
-% SIR_up=1/numbPoints; % perchè lo dice savino/ distance devices ground-drone is the same as the interfeering devices w/ drone. devices look at the drone
-% SIR =Prx/PI=d−η/∑li=1r−ηi
+% 
+%
 % d=dist d:2
 % r= distanza drone punto esterno
 DistExt = hypot(transpose(pdist2([xx0, yy0], [CoordExt(:,1), CoordExt(:,2)])),h_drone);
@@ -250,7 +250,7 @@ for i=1:numbPoints
         count=count+1;
     end
 end
-pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no non era contento
+pr_outage=(count/numbPoints)*100; 
 clear i count pr_outage_threshold
  
 P_rx_pulita_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
