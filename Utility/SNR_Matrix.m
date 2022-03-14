@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-PathName='./Screens/MeSonCacatoErCazzo/dc.mat';
+PathName='./Screens/cartella_workspace/dc.mat';
 load(PathName,'numbPoints', 'radius');
 SNR=zeros(numbPoints,1);
 for i=20:10:400

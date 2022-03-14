@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-PathName='./Screens/MeSonCacatoErCazzo/dc.mat';
+PathName='./Screens/cartella_workspace/dc.mat';
 load(PathName,'numbPoints');
 Coverage=0;
 for i=20:1:400
@@ -201,7 +201,7 @@ Coverage = (1/(pi*radius^2))*integral2(polarfun,0,2*pi,0,radius);
 
 clear i count Prob_threshold polarfun ans
 
-% UpLink/ in salita emilio matricciani vibes
+% UpLink/ in salita
 
 freq_up=2*10^9;
 wavelenght_up=c/freq_up;
@@ -209,7 +209,7 @@ P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
 P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % hyp on-ground devices look at the drone
 P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
 SNR_up= P_rx_pulita_lin_up/P_N;
-% SIR_up=1/numbPoints; % perchè lo dice savino/ distance devices ground-drone is the same as the interfeering devices w/ drone. devices look at the drone
+% SIR_up=1/numbPoints;
 % SIR =Prx/PI=d−η/∑li=1r−ηi
 % d=dist d:2
 % r= distanza drone punto esterno
@@ -251,7 +251,7 @@ for i=1:numbPoints
         count=count+1;
     end
 end
-pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no non era contento
+pr_outage=(count/numbPoints)*100; 
 clear i count pr_outage_threshold
  
 P_rx_pulita_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
@@ -265,7 +265,7 @@ snrmin=min(SNR);
 
 jff=[snrmin, snr_media, snrmax];
 % disp(jff)
-% find drone altitude so that EmilioMean is ~1 
+% find drone altitude  
 
 
 % figure

@@ -125,7 +125,7 @@ for i=1:numbPoints
 end
 clear plostmp plostmp1 tmp i k m
 
-%freezer dragon ball
+%friis
 Xlos = 1 + 2.88.*randn(numbPoints,1);
 Xnlos = 1 + 10.*randn(numbPoints,1);
 pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
