@@ -1,9 +1,8 @@
 clear all;
 close all;
 clc;
-radius=128;
 PathName='./Screens/MeSonCacatoErCazzo/dc.mat';
-load(PathName,'numbPoints');
+load(PathName,'numbPoints', 'radius');
 SNR=zeros(numbPoints,1);
 for i=20:10:400
    temp=MatrixSNR(i,PathName,radius);
