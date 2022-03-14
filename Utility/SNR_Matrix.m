@@ -1,20 +1,21 @@
 clear all;
 close all;
 clc;
+radius=128;
 PathName='./Screens/MeSonCacatoErCazzo/dc.mat';
 load(PathName,'numbPoints');
 SNR=zeros(numbPoints,1);
 for i=20:10:400
-   temp=MatrixSNR(i,PathName);
+   temp=MatrixSNR(i,PathName,radius);
    SNR=[SNR, temp];
 end
 SNR(:,1) = [];
 
-function SNR = MatrixSNR(h_drone,PathName)
+function SNR = MatrixSNR(h_drone,PathName,radius)
 load(PathName)
 
 % % Variables
-radius = 128; %m approximated found by the given area on the pdf
+% radius = 128; %m approximated found by the given area on the pdf
 % xx0 = 0;
 % yy0 = 0;
 % areaTotale=pi*radius^2; 
