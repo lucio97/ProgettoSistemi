@@ -3,16 +3,13 @@ close all;
 clc;
 lambda=1e-2;
 i=100;
-while 1
+h_max=100;
+for i=h_max:-1:0
     test=programma(i,lambda);
     ciao=[i,test];
     disp(ciao)
-    i=i-1;
-    if i==0
-        break
-    end  
+    i=i-1;      
 end
-
 
 function RapportoMin = programma(radius, lambda)
 
