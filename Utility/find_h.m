@@ -3,8 +3,8 @@ close all;
 clc;
 lambda=1e-2;
 i=100;
-h_max=100;
-for i=h_max:-1:0
+h_max=20;
+for i=h_max:-0.5:0
     test=programma(i,lambda);
     ciao=[i,test];
     disp(ciao)

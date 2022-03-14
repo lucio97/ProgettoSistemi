@@ -1,4 +1,4 @@
-% I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
+
 
 clear all;
 close all;
@@ -62,7 +62,7 @@ D = pdist2([xx0 yy0], [x, y]);
 D = transpose(D); %^raggio
 C = hypot(D,h_drone);
 E = asin(h_drone./C); %elevation angle
-F = asind(h_drone./C);
+F = asind(h_drone./C);%degree angles
 
 phi_3dB=70;
 A_m=25; %dB
