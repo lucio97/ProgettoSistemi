@@ -1,9 +1,9 @@
 % I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
-function SNR = SNR_medio(h_drone)
-load('./Screens/MeSonCacatoErCazzo/pd.mat')
+function SNR = SNR_medio(h_drone,PathName)
+load(PathName)
 
 % % Variables
-radius = 500; %m approximated found by the given area on the pdf
+radius = 128; %m approximated found by the given area on the pdf
 % xx0 = 0;
 % yy0 = 0;
 % areaTotale=pi*radius^2; 

@@ -1,9 +1,11 @@
 clear all;
 close all;
 clc;
-SNR=zeros(514,1);
+PathName='./Screens/MeSonCacatoErCazzo/pd.mat';
+load(PathName,'numbPoints');
+SNR=zeros(numbPoints,1);
 for i=200:10:400
-   temp=SNR_medio(i);
-   SNR=[SNR; temp];
+   temp=SNR_medio(i,PathName);
+   SNR=[SNR, temp];
 end
-%SNR(:,1) = [];
+SNR(:,1) = [];
