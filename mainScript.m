@@ -5,12 +5,12 @@ close all;
 clc;
 
 % % Variables
-radius = 128; %m approximated found by the given area on the pdf
+radius = 2000; %m approximated found by the given area on the pdf
 xx0 = 0;
 yy0 = 0;
-areaTotale=pi*radius^2; 
-h_drone = 80;
-h_ric=0;
+TotalArea=pi*radius^2; 
+h_drone = 320;
+h_receiver=0;
 G_tx = 100; 
 G_tx_dB = 10*log10(G_tx);
 G_rx = 1;
@@ -24,7 +24,7 @@ P_tx_dB = 10*log10(P_tx);
 P_N = 2;  %3 dB
 a = 0.3;
 b =300e-6; % buildings/m^2
-lambda=1e-2; % u/m big area little lambda
+lambda=5e-4; % u/m big area little lambda
 eta_l=2;
 eta_nl=3;
 crowns=20;
@@ -38,7 +38,7 @@ yd = transpose(yd);
 
 
 %Main
-numbPoints=poissrnd(areaTotale*lambda); %Poisson number of receiver
+numbPoints=poissrnd(TotalArea*lambda); %Poisson number of receiver
 xx=[];
 yy=[];
 for i=1:size(xd,1)
@@ -49,7 +49,7 @@ for i=1:size(xd,1)
     ytmp=y-yd(i);
     xx= vertcat(xx,xtmp);
     yy= vertcat(yy,ytmp);
-    numbPoints=poissrnd(areaTotale*lambda);
+    numbPoints=poissrnd(TotalArea*lambda);
 end
 clear xtmp ytmp i
 
@@ -109,7 +109,7 @@ prob_los=zeros(numbPoints,1);
 for i=1:numbPoints
     plostmp=1;
     for k=0:m(i)
-        plostmp1=1-exp(-((((h_drone-(k+0.5)*(h_drone+h_ric))/(m(i)+1))^2)/(2*(15^2))));
+        plostmp1=1-exp(-((((h_drone-(k+0.5)*(h_drone+h_receiver))/(m(i)+1))^2)/(2*(15^2))));
         plostmp=plostmp1*plostmp;
     end
     prob_los(i)=plostmp;
@@ -125,9 +125,9 @@ path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos); %Average path loss w/o consi
 P_rx = P_tx*G_tx*G_rx*(wavelenght./(4*pi*D(:,2))).^2;
 path_loss_lin=10.^(path_loss./10);
 CrownsGain_tx_hyp=(G_tx_dB.*(D(:,5)./100)); 
-P_rx_pulita=P_tx_dB-path_loss+G_tfin+G_rx_dB;
-P_rx_pulita_lin=10.^(P_rx_pulita./10);
-SNR = P_rx_pulita_lin/P_N;
+P_rx_clean=P_tx_dB-path_loss+G_tfin+G_rx_dB;
+P_rx_clean_lin=10.^(P_rx_clean./10);
+SNR = P_rx_clean_lin/P_N;
 Capacity=B_signal*log2(SNR+1);
 meanP_rx = mean(P_rx);
 
@@ -182,7 +182,7 @@ SINR = ((SNR.*SIR)./(SNR+SIR));
 P_rx_threshold = 5e-13;
 count=0;
 for i=1:numbPoints
-    if P_rx_pulita_lin(i)>=P_rx_threshold
+    if P_rx_clean_lin(i)>=P_rx_threshold
         count=count+1;
     end
 end
@@ -197,9 +197,9 @@ clear i count Prob_threshold polarfun ans
 freq_up=2*10^9;
 wavelenght_up=c/freq_up;
 P_rx_up = P_tx*G_tx*G_rx*(wavelenght_up./(4*pi.*D(:,2))).^2;
-P_rx_pulita_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % hyp on-ground devices look at the drone
-P_rx_pulita_lin_up=10.^(P_rx_pulita_up./10);
-SNR_up= P_rx_pulita_lin_up/P_N;
+P_rx_clean_up=P_tx_dB-path_loss+G_tx_dB+G_rx_dB; % hyp on-ground devices look at the drone
+P_rx_clean_lin_up=10.^(P_rx_clean_up./10);
+SNR_up= P_rx_clean_lin_up/P_N;
 % SIR_up=1/numbPoints; % perchè lo dice savino/ distance devices ground-drone is the same as the interfeering devices w/ drone. devices look at the drone
 % SIR =Prx/PI=d−η/∑li=1r−ηi
 % d=dist d:2
@@ -210,7 +210,7 @@ prob_los_ext=zeros(size(CoordExt,1),1);
 for i=1:size(CoordExt,1)
     plostmp=1;
     for k=0:m(i)
-        plostmp1=1-exp(-((((h_drone-(k+0.5)*(h_drone+h_ric))/(m(i)+1))^2)/(2*(15^2))));
+        plostmp1=1-exp(-((((h_drone-(k+0.5)*(h_drone+h_receiver))/(m(i)+1))^2)/(2*(15^2))));
         plostmp=plostmp1*plostmp;
     end
     prob_los_ext(i,1)=plostmp;
@@ -237,15 +237,15 @@ mean_SINR_up = mean(SINR_up,'omitnan');
 pr_outage_threshold=10^-16;
 count=0;
 for i=1:numbPoints
-    if P_rx_pulita_lin(i)<pr_outage_threshold
+    if P_rx_clean_lin(i)<pr_outage_threshold
         count=count+1;
     end
 end
 pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no non era contento
 clear i count pr_outage_threshold
  
-P_rx_pulita_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
-Rapporto=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
+P_rx_clean_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
+Rapporto=P_rx_clean_lin_hyp./P_rx_clean_lin;
 RapportoMin=min(Rapporto);
 RapportoMax=max(Rapporto);
 RapportoMean=mean(Rapporto);
@@ -267,3 +267,11 @@ xImage = [-500 500; -500 500]; % The x data for the image corners
 yImage = [0 0; 0 0]; % The y data for the image corners
 zImage = [1000 1000; 500 500]; % The z data for the image corners
 surf(xImage,yImage,zImage,'CData',img,'FaceColor','texturemap'); % Plot the surface
+
+function h = circle(x,y,r)
+d = r*2;
+px = x-r;
+py = y-r;
+h = rectangle('Position',[px py d d],'Curvature',[1,1]);
+daspect([1,1,1])
+end
