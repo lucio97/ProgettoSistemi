@@ -1,60 +1,74 @@
-% I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
-function SNR = SNR_medio(h_drone,PathName)
-load(PathName)
+clear all;
+close all;
+clc;
+lambda=1e-2;
+i=100;
+while 1
+    test=programma(i,lambda);
+    ciao=[i,test];
+    disp(ciao)
+    i=i-1;
+    if i==0
+        break
+    end  
+end
+
+
+function RapportoMin = programma(radius, lambda)
 
 % % Variables
-radius = 128; %m approximated found by the given area on the pdf
-% xx0 = 0;
-% yy0 = 0;
-% areaTotale=pi*radius^2; 
-% h_drone = 640
-% h_ric=0;
-% G_tx = 100; 
-% G_tx_dB = 10*log10(G_tx);
-% G_rx = 1;
-% G_rx_dB = 10*log10(G_rx);
-% B_signal=2*10^7;
-% freq = 2.4*10^9;
-% c = physconst('lightspeed');
-% wavelenght= c/freq;
-% P_tx = 0.063; %18 dbm
-% P_tx_dB = 10*log10(P_tx);
-% P_N = 2;  %3 dB
-% a = 0.3;
-% b =300e-6; % buildings/m^2
-% lambda=1e-5; % u/m big area little lambda
-% eta_l=2;
-% eta_nl=3;
-% crowns=20;
-% crowns_radius= radius/crowns;
-% power_percent=100/crowns;
-% cd=2*radius-(radius/4);
-% xd= [-cd 0 0 cd];
-% yd= [0 -cd cd 0];
-% xd = transpose(xd);
-% yd = transpose(yd);
+% radius = 2000; %m approximated found by the given area on the pdf
+xx0 = 0;
+yy0 = 0;
+h_drone=320;
+areaTotale=pi*radius^2; 
+h_ric=0;
+G_tx = 100; 
+G_tx_dB = 10*log10(G_tx);
+G_rx = 1;
+G_rx_dB = 10*log10(G_rx);
+B_signal=2*10^7;
+freq = 2.4*10^9;
+c = physconst('lightspeed');
+wavelenght= c/freq;
+P_tx = 0.063; %18 dbm
+P_tx_dB = 10*log10(P_tx);
+P_N = 2;  %3 dB
+a = 0.3;
+b =300e-6; % buildings/m^2
+% lambda=1; % u/m big area little lambda
+eta_l=2;
+eta_nl=3;
+crowns=20;
+crowns_radius= radius/crowns;
+power_percent=100/crowns;
+cd=2*radius-(radius/4);
+xd= [-cd 0 0 cd];
+yd= [0 -cd cd 0];
+xd = transpose(xd);
+yd = transpose(yd);
 
 
 %Main
-% numbPoints=poissrnd(areaTotale*lambda); %Poisson number of receiver
-% xx=[];
-% yy=[];
-% for i=1:size(xd,1)
-%     theta=2*pi*(rand(numbPoints,1));
-%     rho2=radius*sqrt(rand(numbPoints,1));
-%     [x,y]=pol2cart(theta,rho2);
-%     xtmp=x-xd(i);
-%     ytmp=y-yd(i);
-%     xx= vertcat(xx,xtmp);
-%     yy= vertcat(yy,ytmp);
-%     numbPoints=poissrnd(areaTotale*lambda);
-% end
-% clear xtmp ytmp i
-% 
-% theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
-% rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
-% 
-% %Convert from polar to Cartesian coordinates
+numbPoints=poissrnd(areaTotale*lambda); %Poisson number of receiver
+xx=[];
+yy=[];
+for i=1:size(xd,1)
+    theta=2*pi*(rand(numbPoints,1));
+    rho2=radius*sqrt(rand(numbPoints,1));
+    [x,y]=pol2cart(theta,rho2);
+    xtmp=x-xd(i);
+    ytmp=y-yd(i);
+    xx= vertcat(xx,xtmp);
+    yy= vertcat(yy,ytmp);
+    numbPoints=poissrnd(areaTotale*lambda);
+end
+clear xtmp ytmp i
+
+theta=2*pi*(rand(numbPoints,1)); %angular coordinates for plot
+rho2=radius*sqrt(rand(numbPoints,1)); %radial coordinates
+
+%Convert from polar to Cartesian coordinates
 [x,y]=pol2cart(theta,rho2); %x/y coordinates of Poisson points
 D = pdist2([xx0 yy0], [x, y]);
 D = transpose(D); %^raggio
@@ -62,10 +76,10 @@ C = hypot(D,h_drone);
 E = asin(h_drone./C); %elevation angle
 F = asind(h_drone./C);
 
-% phi_3dB=70;
-% A_m=25; %dB
-% theta_3dB=10;
-% SLA_v=20;
+phi_3dB=70;
+A_m=25; %dB
+theta_3dB=10;
+SLA_v=20;
 
 A_h=-min((12.*((90-F)./phi_3dB).^2), A_m);
 Theta=90-F;
@@ -91,7 +105,7 @@ for i=1:numbPoints
         end
     end
 end
-clear i k rangeinf rangesup
+% clear i k rangeinf rangesup
 G = transpose(G);
 
 D = [D,C,E,F,G];
@@ -115,8 +129,8 @@ end
 clear plostmp plostmp1 tmp i k m
 
 %freezer dragon ball
-% Xlos = 1 + 2.88.*randn(numbPoints,1);
-% Xnlos = 1 + 10.*randn(numbPoints,1);
+Xlos = 1 + 2.88.*randn(numbPoints,1);
+Xnlos = 1 + 10.*randn(numbPoints,1);
 pl_los=(20*log10((4*pi)/wavelenght))+(10*eta_l*log10(D(:,2)))+Xlos;
 pl_nlos=(20*log10((4*pi)/wavelenght))+(10*eta_nl*log10(D(:,2)))+Xnlos;
 path_loss=prob_los.*pl_los+((1-prob_los).*pl_nlos); %Average path loss w/o considering gains
@@ -139,16 +153,16 @@ mediaP_rx = mean(P_rx);
 % for i=1:size(xd,1)
 %     circle(xd(i),yd(i),radius);
 % end
-% % CoordExt = [xx yy];
 % circle(0,0,radius);
 % hold on
-% scatter(CoordExt(:,1), CoordExt(:,2),'d');
+% scatter(xx,yy,'d');
 % scatter(xd,yd,100,'p', 'filled','red');
 % scatter(0,0,100,'p', 'filled','red');
 % cmap = hsv(11);
 % gscatter(x,y,prob_los,cmap);
 % hold off
-% clear i
+CoordExt = [xx yy];
+clear i xx yy
 
 SIR=zeros(numbPoints,1);
 %  SIR and SINR computation
@@ -231,7 +245,6 @@ media_SINR = mean(SINR,'omitnan');
 media_SIR_up = mean(SIR_up,'omitnan');
 media_SINR_up = mean(SINR_up,'omitnan');
 
-
 % outage probability
 pr_outage_threshold=10^-16;
 count=0;
@@ -244,17 +257,12 @@ pr_outage=(count/numbPoints)*100; %*100 perchè leo voleva la percentuale se no 
 clear i count pr_outage_threshold
  
 P_rx_pulita_lin_hyp=P_tx*G_rx./path_loss_lin.*CrownsGain_tx_hyp;
-Emilio=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
-EmilioMin=min(Emilio);
-EmilioMax=max(Emilio);
-EmilioMean=mean(Emilio);
-snr_media=mean(SNR);
-snrmax=max(SNR);
-snrmin=min(SNR);
+Rapporto=P_rx_pulita_lin_hyp./P_rx_pulita_lin;
+RapportoMin=min(Rapporto);
+RapportoMax=max(Rapporto);
+RapportoMean=mean(Rapporto);
 
-jff=[snrmin, snr_media, snrmax];
-% disp(jff)
-% find drone altitude so that EmilioMean is ~1 
+% find drone altitude so that RapportoMean is ~1 
 
 
 % figure
@@ -271,4 +279,4 @@ jff=[snrmin, snr_media, snrmax];
 % yImage = [0 0; 0 0]; % The y data for the image corners
 % zImage = [1000 1000; 500 500]; % The z data for the image corners
 % surf(xImage,yImage,zImage,'CData',img,'FaceColor','texturemap'); % Plot the surface
-% close all
+end
