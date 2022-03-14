@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-PathName='./Screens/MeSonCacatoErCazzo/pd.mat';
+PathName='./Screens/MeSonCacatoErCazzo/dc.mat';
 load(PathName,'numbPoints');
 SNR=zeros(numbPoints,1);
 for i=200:10:400
