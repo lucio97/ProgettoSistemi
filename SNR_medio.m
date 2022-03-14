@@ -1,6 +1,6 @@
 % I commenti in inglese sono seri, quelli in italiano un po' (tanto) meno
 function SNR = SNR_medio(h_drone)
-load('D:\OneDrive - Politecnico di Milano\Universita\VI Anno\Progetto Sistemi di comunicazione\Screens\1 base\1_nohdrone.mat')
+load('./Screens/MeSonCacatoErCazzo/pd.mat')
 
 % % Variables
 radius = 500; %m approximated found by the given area on the pdf
