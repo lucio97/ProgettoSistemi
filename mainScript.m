@@ -262,7 +262,7 @@ hold on
 xlabel('x');
 ylabel('y');
 zlabel('z');
-img = imread('drone.png');% Load a sampleimage
+img = imread('./Screens/drone.png');% Load a sampleimage
 xImage = [-500 500; -500 500]; % The x data for the image corners
 yImage = [0 0; 0 0]; % The y data for the image corners
 zImage = [1000 1000; 500 500]; % The z data for the image corners
